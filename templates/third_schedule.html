@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>스타벅스 스케줄표</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        .starbucks-green {
+            background-color: #00704A;
+        }
+        .starbucks-green-text {
+            color: #00704A;
+        }
+        .starbucks-green-border {
+            border-color: #00704A;
+        }
+        .position-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            background-color: white;
+        }
+        .position-card:hover {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .shift-card {
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .shift-card.manager {
+            border-left: 4px solid #00704A;
+        }
+        .shift-card.barista {
+            border-left: 4px solid #1e40af;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div id="app" class="min-h-screen">
+        <!-- 헤더 -->
+        <header class="starbucks-green text-white p-4 shadow-lg">
+            <div class="container mx-auto flex items-center">
+                <img src="https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/Starbucks_Corporation_Logo_2011.svg/150px-Starbucks_Corporation_Logo_2011.svg.png" 
+                     alt="Starbucks Logo" 
+                     class="h-12 mr-4">
+                <h1 class="text-2xl font-bold">스타벅스 스케줄표</h1>
+            </div>
+        </header>
+
+        <main class="container mx-auto p-4">
+            <!-- 파트너 관리 섹션 -->
+            <div class="bg-white rounded-lg shadow-lg p-6 mb-6">
+                <h2 class="text-2xl font-bold mb-6 starbucks-green-text">파트너 관리</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- 점장 섹션 -->
+                    <div class="position-card">
+                        <h3 class="text-xl font-bold mb-4 starbucks-green-text">점장</h3>
+                        <div class="mb-4">
+                            <div class="flex gap-2">
+                                <input type="text" 
+                                       v-model="newPartnerNames['점장']"
+                                       @keyup.enter="addPartner('점장')"
+                                       placeholder="점장 이름 입력"
+                                       class="flex-1 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <button @click="addPartner('점장')"
+                                        class="starbucks-green text-white px-4 py-2 rounded hover:opacity-90">
+                                    추가
+                                </button>
+                            </div>
+                            <div class="mt-4 space-y-2">
+                                <div v-for="(partner, index) in partners['점장']" 
+                                     :key="index"
+                                     class="flex items-center justify-between bg-gray-50 p-2 rounded">
+                                    <span class="font-medium">[[ partner ]]</span>
+                                    <button @click="removePartner('점장', index)"
+                                            class="text-red-600 hover:text-red-800">×</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 부점장 섹션 -->
+                    <div class="position-card">
+                        <h3 class="text-xl font-bold mb-4 starbucks-green-text">부점장</h3>
+                        <div class="mb-4">
+                            <div class="flex gap-2">
+                                <input type="text" 
+                                       v-model="newPartnerNames['부점장']"
+                                       @keyup.enter="addPartner('부점장')"
+                                       placeholder="부점장 이름 입력"
+                                       class="flex-1 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <button @click="addPartner('부점장')"
+                                        class="starbucks-green text-white px-4 py-2 rounded hover:opacity-90">
+                                    추가
+                                </button>
+                            </div>
+                            <div class="mt-4 space-y-2">
+                                <div v-for="(partner, index) in partners['부점장']" 
+                                     :key="index"
+                                     class="flex items-center justify-between bg-gray-50 p-2 rounded">
+                                    <span class="font-medium">[[ partner ]]</span>
+                                    <button @click="removePartner('부점장', index)"
+                                            class="text-red-600 hover:text-red-800">×</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 수퍼바이저 섹션 -->
+                    <div class="position-card">
+                        <h3 class="text-xl font-bold mb-4 starbucks-green-text">수퍼바이저</h3>
+                        <div class="mb-4">
+                            <div class="flex gap-2">
+                                <input type="text" 
+                                       v-model="newPartnerNames['수퍼바이저']"
+                                       @keyup.enter="addPartner('수퍼바이저')"
+                                       placeholder="수퍼바이저 이름 입력"
+                                       class="flex-1 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <button @click="addPartner('수퍼바이저')"
+                                        class="starbucks-green text-white px-4 py-2 rounded hover:opacity-90">
+                                    추가
+                                </button>
+                            </div>
+                            <div class="mt-4 space-y-2">
+                                <div v-for="(partner, index) in partners['수퍼바이저']" 
+                                     :key="index"
+                                     class="flex items-center justify-between bg-gray-50 p-2 rounded">
+                                    <span class="font-medium">[[ partner ]]</span>
+                                    <button @click="removePartner('수퍼바이저', index)"
+                                            class="text-red-600 hover:text-red-800">×</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 바리스타 섹션 -->
+                    <div class="position-card">
+                        <h3 class="text-xl font-bold mb-4 starbucks-green-text">바리스타</h3>
+                        <div class="mb-4">
+                            <div class="flex gap-2">
+                                <input type="text" 
+                                       v-model="newPartnerNames['바리스타']"
+                                       @keyup.enter="addPartner('바리스타')"
+                                       placeholder="바리스타 이름 입력"
+                                       class="flex-1 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <button @click="addPartner('바리스타')"
+                                        class="starbucks-green text-white px-4 py-2 rounded hover:opacity-90">
+                                    추가
+                                </button>
+                            </div>
+                            <div class="mt-4 space-y-2">
+                                <div v-for="(partner, index) in partners['바리스타']" 
+                                     :key="index"
+                                     class="flex items-center justify-between bg-gray-50 p-2 rounded">
+                                    <span class="font-medium">[[ partner ]]</span>
+                                    <button @click="removePartner('바리스타', index)"
+                                            class="text-red-600 hover:text-red-800">×</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- P 섹션 -->
+                    <div class="position-card">
+                        <h3 class="text-xl font-bold mb-4 starbucks-green-text">P</h3>
+                        <div class="mb-4">
+                            <div class="flex gap-2">
+                                <input type="text" 
+                                       v-model="newPartnerNames['P']"
+                                       @keyup.enter="addPartner('P')"
+                                       placeholder="P 이름 입력"
+                                       class="flex-1 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <button @click="addPartner('P')"
+                                        class="starbucks-green text-white px-4 py-2 rounded hover:opacity-90">
+                                    추가
+                                </button>
+                            </div>
+                            <div class="mt-4 space-y-2">
+                                <div v-for="(partner, index) in partners['P']" 
+                                     :key="index"
+                                     class="flex items-center justify-between bg-gray-50 p-2 rounded">
+                                    <span class="font-medium">[[ partner ]]</span>
+                                    <button @click="removePartner('P', index)"
+                                            class="text-red-600 hover:text-red-800">×</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 15시간바리스타 섹션 -->
+                    <div class="position-card">
+                        <h3 class="text-xl font-bold mb-4 starbucks-green-text">15시간바리스타</h3>
+                        <div class="mb-4">
+                            <div class="flex gap-2">
+                                <input type="text" 
+                                       v-model="newPartnerNames['15시간바리스타']"
+                                       @keyup.enter="addPartner('15시간바리스타')"
+                                       placeholder="15시간바리스타 이름 입력"
+                                       class="flex-1 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <button @click="addPartner('15시간바리스타')"
+                                        class="starbucks-green text-white px-4 py-2 rounded hover:opacity-90">
+                                    추가
+                                </button>
+                            </div>
+                            <div class="mt-4 space-y-2">
+                                <div v-for="(partner, index) in partners['15시간바리스타']" 
+                                     :key="index"
+                                     class="flex items-center justify-between bg-gray-50 p-2 rounded">
+                                    <span class="font-medium">[[ partner ]]</span>
+                                    <button @click="removePartner('15시간바리스타', index)"
+                                            class="text-red-600 hover:text-red-800">×</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 시간표 섹션 -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-bold mb-6 starbucks-green-text">주간 근무 시간표</h2>
+                
+                <div v-if="Object.values(partners).every(arr => arr.length === 0)" 
+                     class="text-center py-8 text-gray-500">
+                    파트너를 먼저 등록해주세요.
+                </div>
+                
+                <div v-else v-for="(daySchedule, date) in scheduleData" :key="date" class="mb-8">
+                    <h3 class="text-xl font-bold mb-4 starbucks-green-text border-b pb-2">
+                        [[ date ]] ([[ daySchedule.day_name ]])
+                    </h3>
+                    <div class="space-y-4">
+                        <!-- 오픈 출근자 -->
+                        <div class="border-l-4 border-green-600 pl-4">
+                            <h4 class="font-bold text-lg mb-2">오픈 출근자</h4>
+                            <div class="mb-2">
+                                <span class="font-semibold">관리자: </span>
+                                <span v-for="partner in daySchedule.shifts['오픈 쉬프트 (06:30-15:30)']" 
+                                      class="inline-block bg-green-100 text-green-800 rounded px-2 py-1 text-sm mr-2">
+                                    [[ partner ]] (06:30 - 15:30)
+                                </span>
+                            </div>
+                            <div v-if="daySchedule.shifts['오픈 바리스타 (06:30-14:30)'].length > 0">
+                                <span class="font-semibold">바리스타: </span>
+                                <span v-for="partner in daySchedule.shifts['오픈 바리스타 (06:30-14:30)']" 
+                                      class="inline-block bg-blue-100 text-blue-800 rounded px-2 py-1 text-sm mr-2">
+                                    [[ partner ]] (06:30 - 14:30)
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- 미들 출근자 -->
+                        <div class="border-l-4 border-yellow-600 pl-4">
+                            <h4 class="font-bold text-lg mb-2">미들 출근자</h4>
+                            <div class="mb-2">
+                                <span class="font-semibold">관리자: </span>
+                                <span v-for="partner in daySchedule.shifts['미들 쉬프트1 (09:00-16:30)']" 
+                                      class="inline-block bg-yellow-100 text-yellow-800 rounded px-2 py-1 text-sm mr-2">
+                                    [[ partner ]] (09:00 - 16:30)
+                                </span>
+                                <span v-for="partner in daySchedule.shifts['미들 쉬프트2 (09:30-17:00)']" 
+                                      class="inline-block bg-yellow-100 text-yellow-800 rounded px-2 py-1 text-sm mr-2">
+                                    [[ partner ]] (09:30 - 17:00)
+                                </span>
+                            </div>
+                            <div v-if="daySchedule.shifts['P 시프트 (08:00-12:30)'].length > 0 || daySchedule.shifts['P 시프트2 (10:00-14:30)'].length > 0">
+                                <span class="font-semibold">P: </span>
+                                <span v-for="partner in daySchedule.shifts['P 시프트 (08:00-12:30)']" 
+                                      class="inline-block bg-pink-100 text-pink-800 rounded px-2 py-1 text-sm mr-2">
+                                    [[ partner ]] (08:00 - 12:30)
+                                </span>
+                                <span v-for="partner in daySchedule.shifts['P 시프트2 (10:00-14:30)']" 
+                                      class="inline-block bg-pink-100 text-pink-800 rounded px-2 py-1 text-sm mr-2">
+                                    [[ partner ]] (10:00 - 14:30)
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- 마감 출근자 -->
+                        <div class="border-l-4 border-red-600 pl-4">
+                            <h4 class="font-bold text-lg mb-2">마감 출근자</h4>
+                            <div class="mb-2">
+                                <span class="font-semibold">관리자: </span>
+                                <span v-for="partner in daySchedule.shifts['마감 쉬프트 (13:00-22:00)']" 
+                                      class="inline-block bg-red-100 text-red-800 rounded px-2 py-1 text-sm mr-2">
+                                    [[ partner ]] (13:00 - 22:00)
+                                </span>
+                            </div>
+                            <div class="mb-2">
+                                <span class="font-semibold">바리스타: </span>
+                                <span v-for="partner in daySchedule.shifts['마감 바리스타1 (15:00-22:00)']" 
+                                      class="inline-block bg-blue-100 text-blue-800 rounded px-2 py-1 text-sm mr-2">
+                                    [[ partner ]] (15:00 - 22:00)
+                                </span>
+                                <span v-for="partner in daySchedule.shifts['마감 바리스타2 (15:00-22:00)']" 
+                                      class="inline-block bg-blue-100 text-blue-800 rounded px-2 py-1 text-sm mr-2">
+                                    [[ partner ]] (15:00 - 22:00)
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- 주말 추가 출근자 -->
+                        <div v-if="daySchedule.shifts['아침 바리스타/쉬프트 (08:00-15:00)'].length > 0" 
+                             class="border-l-4 border-purple-600 pl-4">
+                            <h4 class="font-bold text-lg mb-2">주말 추가 출근자</h4>
+                            <div>
+                                <span class="font-semibold">추가 인원: </span>
+                                <span v-for="partner in daySchedule.shifts['아침 바리스타/쉬프트 (08:00-15:00)']" 
+                                      class="inline-block bg-purple-100 text-purple-800 rounded px-2 py-1 text-sm mr-2">
+                                    [[ partner ]] (08:00 - 15:00)
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <button v-if="!Object.values(partners).every(arr => arr.length === 0)"
+                    @click="generateNewSchedule" 
+                    class="mt-6 starbucks-green text-white px-6 py-3 rounded-full hover:opacity-90 transition-opacity flex items-center mx-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+                </svg>
+                새로운 스케줄 생성
+            </button>
+        </main>
+    </div>
+
+    <script>
+        const { createApp } = Vue
+
+        createApp({
+            delimiters: ['[[', ']]'],
+            data() {
+                return {
+                    scheduleData: {},
+                    partners: {
+                        "점장": [],
+                        "부점장": [],
+                        "수퍼바이저": [],
+                        "바리스타": [],
+                        "P": [],
+                        "15시간바리스타": []
+                    },
+                    positions: ["점장", "부점장", "수퍼바이저", "바리스타", "P", "15시간바리스타"],
+                    newPartnerNames: {
+                        "점장": "",
+                        "부점장": "",
+                        "수퍼바이저": "",
+                        "바리스타": "",
+                        "P": "",
+                        "15시간바리스타": ""
+                    }
+                }
+            },
+            methods: {
+                async loadSchedule() {
+                    try {
+                        const response = await fetch('/api/schedule')
+                        if (!response.ok) {
+                            throw new Error('스케줄 로딩 실패')
+                        }
+                        const data = await response.json()
+                        console.log('로드된 스케줄:', data) // 디버깅용 로그
+                        this.scheduleData = data
+                    } catch (error) {
+                        console.error('스케줄 로딩 에러:', error)
+                        alert('스케줄을 불러오는데 실패했습니다.')
+                    }
+                },
+                async loadPartners() {
+                    try {
+                        const response = await fetch('/api/partners')
+                        if (!response.ok) {
+                            throw new Error('파트너 로딩 실패')
+                        }
+                        const data = await response.json()
+                        console.log('로드된 파트너:', data) // 디버깅용 로그
+                        this.partners = {
+                            "점장": data.점장 || [],
+                            "부점장": data.부점장 || [],
+                            "수퍼바이저": data.수퍼바이저 || [],
+                            "바리스타": data.바리스타 || [],
+                            "P": data.P || [],
+                            "15시간바리스타": data["15시간바리스타"] || []
+                        }
+                    } catch (error) {
+                        console.error('파트너 로딩 에러:', error)
+                        alert('파트너 정보를 불러오는데 실패했습니다.')
+                    }
+                },
+                async savePartners() {
+                    try {
+                        const response = await fetch('/api/partners', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ partners: this.partners })
+                        })
+                        if (!response.ok) {
+                            throw new Error('파트너 저장 실패')
+                        }
+                        await this.loadSchedule() // 파트너 저장 후 스케줄 다시 로드
+                    } catch (error) {
+                        console.error('파트너 저장 에러:', error)
+                        alert('파트너 정보 저장에 실패했습니다.')
+                    }
+                },
+                async addPartner(position) {
+                    const name = this.newPartnerNames[position].trim()
+                    if (name) {
+                        if (!this.partners[position]) {
+                            this.partners[position] = []
+                        }
+                        this.partners[position].push(name)
+                        this.newPartnerNames[position] = ''
+                        await this.savePartners()
+                    }
+                },
+                async removePartner(position, index) {
+                    this.partners[position].splice(index, 1)
+                    await this.savePartners()
+                },
+                async generateNewSchedule() {
+                    try {
+                        await this.loadSchedule()
+                        console.log('새로운 스케줄 생성됨') // 디버깅용 로그
+                    } catch (error) {
+                        console.error('새로운 스케줄 생성 에러:', error)
+                        alert('새로운 스케줄 생성에 실패했습니다.')
+                    }
+                }
+            },
+            async mounted() {
+                console.log('컴포넌트 마운트됨') // 디버깅용 로그
+                await this.loadPartners()
+                await this.loadSchedule()
+            }
+        }).mount('#app')
+    </script>
+</body>
+</html> 

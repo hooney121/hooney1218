@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>스타벅스 파트너 스케줄러</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        .starbucks-green {
+            background-color: #00704A;
+        }
+        .starbucks-green-text {
+            color: #00704A;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div id="app" class="min-h-screen">
+        <!-- 헤더 -->
+        <header class="starbucks-green text-white p-4 shadow-lg">
+            <div class="container mx-auto flex items-center">
+                <img src="https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/Starbucks_Corporation_Logo_2011.svg/150px-Starbucks_Corporation_Logo_2011.svg.png" 
+                     alt="Starbucks Logo" 
+                     class="h-12 mr-4">
+                <h1 class="text-2xl font-bold">파트너 스케줄러</h1>
+            </div>
+        </header>
+
+        <main class="container mx-auto px-4 py-8">
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <h2 class="text-xl font-bold mb-4 starbucks-green-text">2주 근무 일정표</h2>
+                
+                <div class="grid grid-cols-7 gap-4">
+                    <template v-for="(schedule, date) in scheduleData">
+                        <div class="border rounded-lg p-4 hover:shadow-md transition-shadow">
+                            <h3 class="font-bold mb-2 starbucks-green-text">[[ date ]]</h3>
+                            <div class="mb-4">
+                                <h4 class="font-semibold text-gray-700">근무 파트너 ([[ schedule.working.length ]]명)</h4>
+                                <ul class="space-y-2 mt-2">
+                                    <li v-for="staff in schedule.working" class="text-sm">
+                                        <span class="font-medium">[[ staff ]]</span>
+                                        <br>
+                                        <span class="text-xs text-gray-600">[[ schedule.shifts[staff] ]]</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-gray-700">휴무 파트너</h4>
+                                <ul class="list-disc list-inside">
+                                    <li v-for="staff in schedule.off" class="text-sm text-gray-600">[[ staff ]]</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+            
+            <button @click="generateSchedule" 
+                    class="starbucks-green text-white px-6 py-3 rounded-full hover:opacity-90 transition-opacity flex items-center mx-auto">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd" />
+                </svg>
+                새로운 스케줄 생성
+            </button>
+        </main>
+    </div>
+
+    <script>
+        const { createApp } = Vue
+
+        createApp({
+            delimiters: ['[[', ']]'],
+            data() {
+                return {
+                    scheduleData: {}
+                }
+            },
+            methods: {
+                async generateSchedule() {
+                    const response = await fetch('/api/schedule')
+                    this.scheduleData = await response.json()
+                }
+            },
+            mounted() {
+                this.generateSchedule()
+            }
+        }).mount('#app')
+    </script>
+</body>
+</html> 
